@@ -1,4 +1,13 @@
-{ mkServerModule, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  mkServerModule,
+  ...
+}:
+let
+  cfg = config.programs.codex;
+in
 {
   imports = [
     (mkServerModule {
@@ -6,4 +15,10 @@
       packageName = "codex";
     })
   ];
+
+  config.settings.servers = lib.mkIf cfg.enable {
+    codex = {
+      args = ["mcp"];
+    };
+  };
 }
