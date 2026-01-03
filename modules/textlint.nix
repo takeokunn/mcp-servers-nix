@@ -8,7 +8,7 @@
 let
   cfg = config.programs.textlint;
 
-  allExtensions = cfg.rules ++ cfg.plugins ++ cfg.presets ++ cfg.filter-rules ++ cfg.configs;
+  allExtensions = cfg.rules ++ cfg.plugins ++ cfg.presets ++ cfg.filterRules ++ cfg.configs;
 
   finalPackage =
     if allExtensions == [ ] then
@@ -59,7 +59,7 @@ in
       '';
     };
 
-    filter-rules = lib.mkOption {
+    filterRules = lib.mkOption {
       type = with lib.types; listOf package;
       default = [ ];
       example = lib.literalExpression "[ pkgs.textlint-filter-rule-comments ]";
@@ -78,13 +78,28 @@ in
         Shareable configs provide complete textlint configurations.
       '';
     };
+
+    configFile = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      example = lib.literalExpression "./.textlintrc.json";
+      description = ''
+        Path to .textlintrc configuration file.
+        This file specifies which rules to enable and their settings.
+      '';
+    };
   };
 
   config = lib.mkIf cfg.enable {
     programs.textlint.package = lib.mkDefault finalPackage;
 
     settings.servers.textlint = {
-      args = [ "--mcp" ];
+      args =
+        [ "--mcp" ]
+        ++ lib.optionals (cfg.configFile != null) [
+          "--config"
+          (toString cfg.configFile)
+        ];
     };
   };
 }
