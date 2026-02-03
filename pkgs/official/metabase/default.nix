@@ -12,19 +12,19 @@
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "metabase-mcp";
-  version = "1.0.0";
+  version = "1.0.2";
 
   src = fetchFromGitHub {
     owner = "takeokunn";
     repo = "metabase-mcp";
-    rev = "v${finalAttrs.version}";
-    hash = "sha256-M7pYpjSn4D0lHILhsEK4IcBaTRRz0whg60ADlymlwOI=";
+    rev = "refs/tags/v${finalAttrs.version}";
+    hash = "sha256-rdhf4S8lfuDFVvxAdQ/0w/jZE8rArOx6C7egwAu0un0=";
   };
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
-    fetcherVersion = 3;
     hash = "sha256-dc7gAG+P+8BYD45TiEW4xrC/lie3xld7s5yO1iM60GQ=";
+    fetcherVersion = 3;
   };
 
   nativeBuildInputs = [
@@ -48,7 +48,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     cp -r node_modules $out/lib/metabase-mcp/
     cp package.json $out/lib/metabase-mcp/
 
-    makeWrapper ${nodejs-slim_22}/bin/node $out/bin/metabase-mcp \
+    makeBinaryWrapper ${nodejs-slim_22}/bin/node $out/bin/metabase-mcp \
       --add-flags "$out/lib/metabase-mcp/dist/index.js"
     runHook postInstall
   '';
@@ -57,13 +57,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     description = "MCP server for Metabase integration";
     homepage = "https://github.com/takeokunn/metabase-mcp";
     license = lib.licenses.mit;
-    maintainers = [
-      {
-        github = "takeokunn";
-        githubId = 11222510;
-        name = "takeokunn";
-      }
-    ];
+    maintainers = with lib.maintainers; [ takeokunn ];
+    platforms = lib.platforms.unix;
     mainProgram = "metabase-mcp";
   };
 })
